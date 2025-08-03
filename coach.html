@@ -2,7 +2,7 @@
 <html lang="zh-TW">
 <head>
   <meta charset="UTF-8" />
-  <title>倒數語音提示</title>
+  <title>倒數語音訓練</title>
   <style>
     html, body {
       margin: 0; padding: 0; height: 100%;
@@ -17,9 +17,18 @@
       font-weight: bold;
     }
     #color {
-      font-size: 160px;
+      font-size: 80px;
       font-weight: bold;
       margin-top: 40px;
+    }
+    #startBtn {
+      font-size: 24px;
+      padding: 16px 32px;
+      background-color: black;
+      color: white;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
     }
     h1 {
       font-size: 32px;
@@ -28,7 +37,8 @@
   </style>
 </head>
 <body>
-  <h1>倒數訓練中</h1>
+  <h1>倒數語音訓練</h1>
+  <button id="startBtn">開始訓練</button>
   <div id="countdown"></div>
   <div id="color"></div>
 
@@ -36,16 +46,14 @@
     const colors = ["黑色", "紅色", "黃色"];
     let autoRunning = false;
 
-    //  語音播放（含取消、超時保險）
-    function speak(text, callback) {
-      speechSynthesis.cancel();  // 先取消其他語音
+    function speak(text, rate = 1.2, callback) {
+      speechSynthesis.cancel();
 
       const utterance = new SpeechSynthesisUtterance(text);
       utterance.lang = "zh-TW";
-      utterance.rate = 1.2;
+      utterance.rate = rate;
 
       let called = false;
-
       utterance.onend = () => {
         if (!called) {
           called = true;
@@ -55,7 +63,6 @@
 
       speechSynthesis.speak(utterance);
 
-      // 超過3秒未結束，強制呼叫 callback（保險）
       setTimeout(() => {
         if (!called) {
           called = true;
@@ -67,6 +74,8 @@
     function startCountdown() {
       if (autoRunning) return;
       autoRunning = true;
+
+      document.getElementById("startBtn").style.display = "none";
 
       const countdown = document.getElementById("countdown");
       const colorText = document.getElementById("color");
@@ -90,7 +99,7 @@
           countdown.textContent = "";
           speakRandomColor(() => {
             autoRunning = false;
-            startCountdown(); // 不延遲，立即下一輪
+            startCountdown();
           });
         }
       }
@@ -103,12 +112,12 @@
       const colorText = document.getElementById("color");
       colorText.textContent = color;
 
-      speak(color, callback);
+      speak(color, 1.4, callback);
     }
 
-    window.onload = () => {
+    document.getElementById("startBtn").addEventListener("click", () => {
       startCountdown();
-    };
+    });
   </script>
 </body>
 </html>
