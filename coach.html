@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8" />
+  <title>倒數語音提示</title>
+  <style>
+    html, body {
+      margin: 0; padding: 0; height: 100%;
+      background-color: white;
+      color: black;
+      font-family: sans-serif;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+    }
+    #countdown {
+      font-size: 160px;
+      font-weight: bold;
+    }
+    #color {
+      font-size: 160px;
+      font-weight: bold;
+      margin-top: 40px;
+    }
+    h1 {
+      font-size: 32px;
+      margin-bottom: 20px;
+    }
+  </style>
+</head>
+<body>
+  <h1>倒數訓練中</h1>
+  <div id="countdown"></div>
+  <div id="color"></div>
+
+  <script>
+    const colors = ["黑色", "紅色", "黃色"];
+    let autoRunning = false;
+
+    //  語音播放（含取消、超時保險）
+    function speak(text, callback) {
+      speechSynthesis.cancel();  // 先取消其他語音
+
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.lang = "zh-TW";
+      utterance.rate = 1.2;
+
+      let called = false;
+
+      utterance.onend = () => {
+        if (!called) {
+          called = true;
+          if (callback) callback();
+        }
+      };
+
+      speechSynthesis.speak(utterance);
+
+      // 超過3秒未結束，強制呼叫 callback（保險）
+      setTimeout(() => {
+        if (!called) {
+          called = true;
+          if (callback) callback();
+        }
+      }, 3000);
+    }
+
+    function startCountdown() {
+      if (autoRunning) return;
+      autoRunning = true;
+
+      const countdown = document.getElementById("countdown");
+      const colorText = document.getElementById("color");
+
+      colorText.textContent = "";
+      let counter = 9;
+      countdown.textContent = counter;
+
+      function countdownStep() {
+        if (counter > 3) {
+          countdown.textContent = counter;
+          counter--;
+          setTimeout(countdownStep, 1000);
+        } else if (counter >= 1) {
+          countdown.textContent = counter;
+          speak(String(counter), () => {
+            counter--;
+            countdownStep();
+          });
+        } else {
+          countdown.textContent = "";
+          speakRandomColor(() => {
+            autoRunning = false;
+            startCountdown(); // 不延遲，立即下一輪
+          });
+        }
+      }
+
+      countdownStep();
+    }
+
+    function speakRandomColor(callback) {
+      const color = colors[Math.floor(Math.random() * colors.length)];
+      const colorText = document.getElementById("color");
+      colorText.textContent = color;
+
+      speak(color, callback);
+    }
+
+    window.onload = () => {
+      startCountdown();
+    };
+  </script>
+</body>
+</html>
