@@ -3,58 +3,83 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>綠(左)、紅(右)、藍(雙手)</title>
+<title>放鬆及反應訓練（隨機顯示文字版本）</title>
 <style>
   body {
-    transition: background-color 0.3s ease;
     background-color: white;
     height: 100vh;
     margin: 0;
     display: flex;
+    flex-direction: column;
     justify-content: center;
     align-items: center;
-    font-size: 2rem;
+    user-select: none;
+  }
+  #text {
     font-weight: bold;
     color: black;
-    user-select: none;
+    white-space: nowrap; /* 不換行 */
+    line-height: 1;
+    text-align: center;
+  }
+  #progress {
+    font-size: 3vw;
+    margin-top: 1rem;
+    color: gray;
   }
 </style>
 </head>
 <body>
+<div id="text"></div>
 <div id="progress">進度：第 0 次 / 20 次</div>
 
 <script>
-  const colors = ['green', 'red', 'blue'];
+  const words = ['左手', '右手', '雙手'];
   let count = 0;
   const maxCount = 20;
+  const textDiv = document.getElementById('text');
   const progressDiv = document.getElementById('progress');
 
-  function cycleColor() {
+  function setMaxFontSize(el, text) {
+    el.textContent = text;
+    let fontSize = 10;
+    el.style.fontSize = fontSize + 'px';
+
+    // 不斷增大字體直到超過螢幕範圍
+    while (
+      el.scrollWidth <= window.innerWidth * 0.9 &&
+      el.scrollHeight <= window.innerHeight * 0.6
+    ) {
+      fontSize++;
+      el.style.fontSize = fontSize + 'px';
+    }
+    // 回退到剛好適合的大小
+    el.style.fontSize = (fontSize - 1) + 'px';
+  }
+
+  function cycleWord() {
     if (count >= maxCount) {
-      document.body.style.backgroundColor = 'white';
-      progressDiv.textContent = `完成！共 ${maxCount} 次`;
+      setMaxFontSize(textDiv, '完成！');
+      progressDiv.textContent = `共 ${maxCount} 次`;
       return;
     }
 
-    // 隨機選色
-    const randomColor = colors[Math.floor(Math.random() * colors.length)];
-    document.body.style.backgroundColor = randomColor;
+    // 隨機顯示文字並最大化
+    const randomWord = words[Math.floor(Math.random() * words.length)];
+    setMaxFontSize(textDiv, randomWord);
     progressDiv.textContent = `進度：第 ${count + 1} 次 / ${maxCount} 次`;
-    progressDiv.style.color = (randomColor === 'blue') ? 'white' : 'black';
 
+    // 0.5 秒後清空文字，停 1 秒再進入下一輪
     setTimeout(() => {
-      // 切回白色並更新文字顏色
-      document.body.style.backgroundColor = 'white';
-      progressDiv.style.color = 'black';
-
+      textDiv.textContent = '';
       setTimeout(() => {
         count++;
-        cycleColor();
+        cycleWord();
       }, 1000);
     }, 1000);
   }
 
-  cycleColor();
+  cycleWord();
 </script>
 </body>
 </html>
