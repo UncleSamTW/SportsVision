@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <title>背景顏色隨機變換</title>
+  <style>
+    html, body {
+      height: 100%;
+      margin: 0;
+      transition: background-color 0.5s ease;
+    }
+  </style>
+</head>
+<body>
+
+<script>
+  // 定義五種顏色
+  const colors = ['black', 'orange', 'yellow', 'green', 'blue'];
+
+  let intervalId = null;
+  let secondsElapsed = 0;
+  const totalSeconds = 5 * 60; // 5分鐘 = 300秒
+
+  function changeBackgroundColor() {
+    // 從 colors 中隨機選一色
+    const randomColor = colors[Math.floor(Math.random() * colors.length)];
+    document.body.style.backgroundColor = randomColor;
+  }
+
+  function startColorChange() {
+    changeBackgroundColor(); // 先換一次顏色
+    intervalId = setInterval(() => {
+      secondsElapsed++;
+      if (secondsElapsed >= totalSeconds) {
+        clearInterval(intervalId); // 停止變色
+      } else {
+        changeBackgroundColor();
+      }
+    }, 2000);
+  }
+
+  // 頁面載入後開始變色
+  window.onload = startColorChange;
+</script>
+
+</body>
+</html>
