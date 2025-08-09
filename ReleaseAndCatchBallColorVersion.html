@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>背景隨機變色與進度</title>
+<style>
+  body {
+    transition: background-color 0.3s ease;
+    background-color: white;
+    height: 100vh;
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 2rem;
+    font-weight: bold;
+    color: black;
+    user-select: none;
+  }
+</style>
+</head>
+<body>
+<div id="progress">進度：第 0 次 / 20 次</div>
+
+<script>
+  const colors = ['green', 'red', 'blue'];
+  let count = 0;
+  const maxCount = 20;
+  const progressDiv = document.getElementById('progress');
+
+  function cycleColor() {
+    if (count >= maxCount) {
+      document.body.style.backgroundColor = 'white';
+      progressDiv.textContent = `完成！共 ${maxCount} 次`;
+      return;
+    }
+
+    // 隨機選色
+    const randomColor = colors[Math.floor(Math.random() * colors.length)];
+    document.body.style.backgroundColor = randomColor;
+    progressDiv.textContent = `進度：第 ${count + 1} 次 / ${maxCount} 次`;
+    progressDiv.style.color = (randomColor === 'blue') ? 'white' : 'black';
+
+    setTimeout(() => {
+      // 切回白色並更新文字顏色
+      document.body.style.backgroundColor = 'white';
+      progressDiv.style.color = 'black';
+
+      setTimeout(() => {
+        count++;
+        cycleColor();
+      }, 1000);
+    }, 1000);
+  }
+
+  cycleColor();
+</script>
+</body>
+</html>
