@@ -11,23 +11,34 @@
     height: 100vh;
     margin: 0;
     display: flex;
+    flex-direction: column;
     justify-content: center;
     align-items: center;
-    font-size: 2rem;
     font-weight: bold;
-    color: black;
     user-select: none;
+  }
+  #countdown {
+    font-size: 20vw; /* 倒數字最大化 */
+    color: red;
+    line-height: 1;
+  }
+  #progress {
+    font-size: 3vw;
+    margin-top: 1rem;
+    color: black;
   }
 </style>
 </head>
 <body>
-<div id="progress">進度：第 0 次 / 20 次</div>
+<div id="countdown"></div>
+<div id="progress" style="display:none;">進度：第 0 次 / 20 次</div>
 
 <script>
   const colors = ['green', 'red', 'blue', 'black', 'yellow'];
   let count = 0;
   const maxCount = 20;
   const progressDiv = document.getElementById('progress');
+  const countdownDiv = document.getElementById('countdown');
 
   function cycleColor() {
     if (count >= maxCount) {
@@ -43,7 +54,7 @@
     progressDiv.style.color = (randomColor === 'blue') ? 'white' : 'black';
 
     setTimeout(() => {
-      // 切回白色並更新文字顏色
+      // 切回白色
       document.body.style.backgroundColor = 'white';
       progressDiv.style.color = 'black';
 
@@ -54,7 +65,24 @@
     }, 1000);
   }
 
-  cycleColor();
+  function startCountdown(seconds, callback) {
+    let remaining = seconds;
+    countdownDiv.textContent = remaining;
+    const interval = setInterval(() => {
+      remaining--;
+      if (remaining > 0) {
+        countdownDiv.textContent = remaining;
+      } else {
+        clearInterval(interval);
+        countdownDiv.textContent = '';
+        progressDiv.style.display = 'block'; // 倒數完才顯示進度
+        callback();
+      }
+    }, 1000);
+  }
+
+  // 先倒數 10 秒，再開始換顏色
+  startCountdown(10, cycleColor);
 </script>
 </body>
 </html>
