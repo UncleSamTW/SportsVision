@@ -18,7 +18,7 @@
   #text {
     font-weight: bold;
     color: black;
-    white-space: nowrap; /* 不換行 */
+    white-space: nowrap;
     line-height: 1;
     text-align: center;
   }
@@ -31,7 +31,7 @@
 </head>
 <body>
 <div id="text"></div>
-<div id="progress">進度：第 0 次 / 20 次</div>
+<div id="progress"></div>
 
 <script>
   const words = ['左手', '右手', '雙手'];
@@ -45,7 +45,6 @@
     let fontSize = 10;
     el.style.fontSize = fontSize + 'px';
 
-    // 不斷增大字體直到超過螢幕範圍
     while (
       el.scrollWidth <= window.innerWidth * 0.9 &&
       el.scrollHeight <= window.innerHeight * 0.6
@@ -53,7 +52,6 @@
       fontSize++;
       el.style.fontSize = fontSize + 'px';
     }
-    // 回退到剛好適合的大小
     el.style.fontSize = (fontSize - 1) + 'px';
   }
 
@@ -64,12 +62,10 @@
       return;
     }
 
-    // 隨機顯示文字並最大化
     const randomWord = words[Math.floor(Math.random() * words.length)];
     setMaxFontSize(textDiv, randomWord);
     progressDiv.textContent = `進度：第 ${count + 1} 次 / ${maxCount} 次`;
 
-    // 0.5 秒後清空文字，停 1 秒再進入下一輪
     setTimeout(() => {
       textDiv.textContent = '';
       setTimeout(() => {
@@ -79,7 +75,22 @@
     }, 1000);
   }
 
-  cycleWord();
+  function startCountdown(seconds, callback) {
+    let remaining = seconds;
+    const countdownInterval = setInterval(() => {
+      setMaxFontSize(textDiv, remaining);
+      progressDiv.textContent = '即將開始，倒數計時…';
+      remaining--;
+
+      if (remaining < 0) {
+        clearInterval(countdownInterval);
+        callback();
+      }
+    }, 1000);
+  }
+
+  // 先倒數 10 秒，倒數結束再開始隨機文字顯示
+  startCountdown(10, cycleWord);
 </script>
 </body>
 </html>
