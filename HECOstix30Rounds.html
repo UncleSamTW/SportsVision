@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>倒數 + 隨機背景顏色</title>
+<style>
+  body {
+    margin: 0;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 5rem;
+    background-color: white;
+    color: black;
+  }
+</style>
+</head>
+<body>
+<div id="display">即將開始，倒數計時：10</div>
+
+<script>
+  const colors = ["black", "yellow", "red"];
+  let round = 0;
+  const maxRounds = 30;
+  const displayEl = document.getElementById("display");
+
+  function startCountdown() {
+    let timeLeft = 10;
+    document.body.style.backgroundColor = "white";
+    displayEl.style.color = "black";
+    displayEl.textContent = `即將開始，倒數計時：${timeLeft}`;
+
+    const countdownTimer = setInterval(() => {
+      timeLeft--;
+      if (timeLeft > 0) {
+        displayEl.textContent = `即將開始，倒數計時：${timeLeft}`;
+      } else {
+        clearInterval(countdownTimer);
+        showRandomColor();
+      }
+    }, 1000);
+  }
+
+  function showRandomColor() {
+    const randomColor = colors[Math.floor(Math.random() * colors.length)];
+    document.body.style.backgroundColor = randomColor;
+    displayEl.textContent = ""; // 不顯示文字
+
+    setTimeout(() => {
+      round++;
+      if (round < maxRounds) {
+        startCountdown();
+      } else {
+        document.body.style.backgroundColor = "black";
+        displayEl.style.color = "white";
+        displayEl.textContent = "結束";
+      }
+    }, 2000); // 顏色維持 2 秒
+  }
+
+  // 第一次啟動倒數
+  startCountdown();
+</script>
+</body>
+</html>
