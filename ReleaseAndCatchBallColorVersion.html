@@ -31,14 +31,15 @@
 </head>
 <body>
 <div id="countdown"></div>
-<div id="progress" style="display:none;">進度：第 0 次 / 20 次</div>
+<div id="progress" style="display:none;">進度：第 0 次 / 30 次</div>
 
 <script>
   const colors = ['green', 'red', 'blue', 'black', 'yellow'];
   let count = 0;
-  const maxCount = 20;
+  const maxCount = 30;
   const progressDiv = document.getElementById('progress');
   const countdownDiv = document.getElementById('countdown');
+  let lastColor = null; // 紀錄上一個顏色
 
   function cycleColor() {
     if (count >= maxCount) {
@@ -47,22 +48,17 @@
       return;
     }
 
-    // 隨機選色
-    const randomColor = colors[Math.floor(Math.random() * colors.length)];
+    // 選擇不重複的隨機顏色
+    let availableColors = colors.filter(c => c !== lastColor);
+    const randomColor = availableColors[Math.floor(Math.random() * availableColors.length)];
+    lastColor = randomColor;
+
     document.body.style.backgroundColor = randomColor;
     progressDiv.textContent = `進度：第 ${count + 1} 次 / ${maxCount} 次`;
     progressDiv.style.color = (randomColor === 'blue') ? 'white' : 'black';
 
-    setTimeout(() => {
-      // 切回白色
-      document.body.style.backgroundColor = 'white';
-      progressDiv.style.color = 'black';
-
-      setTimeout(() => {
-        count++;
-        cycleColor();
-      }, 1000);
-    }, 1000);
+    count++;
+    setTimeout(cycleColor, 1500); // 1.5 秒後換下一個顏色
   }
 
   function startCountdown(seconds, callback) {
@@ -81,7 +77,6 @@
     }, 1000);
   }
 
-  // 先倒數 10 秒，再開始換顏色
   startCountdown(10, cycleColor);
 </script>
 </body>
