@@ -1,47 +1,57 @@
 <!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
-  <meta charset="UTF-8" />
-  <title>背景顏色隨機變換</title>
-  <style>
-    html, body {
-      height: 100%;
-      margin: 0;
-      transition: background-color 0.5s ease;
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>倒數顏色變化</title>
+<style>
+  body {
+    margin: 0;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-family: sans-serif;
+    transition: background-color 0.5s;
+    background-color: white;
+  }
+  #countdown {
+    font-size: 10rem; /* 倒數文字最大 */
+    transition: font-size 0.5s, opacity 0.5s;
+  }
+</style>
 </head>
 <body>
+<div id="countdown">10</div>
 
 <script>
-  // 定義五種顏色
-  const colors = ['black', 'orange', 'yellow', 'green', 'blue'];
+const colors = ["blue", "orange", "white", "green", "yellow"];
+let countdown = 10;
+let lastColor = null;
 
-  let intervalId = null;
-  let secondsElapsed = 0;
-  const totalSeconds = 5 * 60; // 5分鐘 = 300秒
+const countdownDiv = document.getElementById("countdown");
 
-  function changeBackgroundColor() {
-    // 從 colors 中隨機選一色
-    const randomColor = colors[Math.floor(Math.random() * colors.length)];
-    document.body.style.backgroundColor = randomColor;
-  }
+function getRandomColor() {
+  const availableColors = colors.filter(c => c !== lastColor);
+  const randomColor = availableColors[Math.floor(Math.random() * availableColors.length)];
+  lastColor = randomColor;
+  return randomColor;
+}
 
-  function startColorChange() {
-    changeBackgroundColor(); // 先換一次顏色
-    intervalId = setInterval(() => {
-      secondsElapsed++;
-      if (secondsElapsed >= totalSeconds) {
-        clearInterval(intervalId); // 停止變色
-      } else {
-        changeBackgroundColor();
-      }
+// 倒數 10 秒
+const countdownInterval = setInterval(() => {
+  countdownDiv.textContent = countdown;
+  document.body.style.backgroundColor = "white"; // 倒數時背景固定白色
+  countdown--;
+  if (countdown < 0) {
+    clearInterval(countdownInterval);
+    countdownDiv.style.opacity = 0; // 文字消失
+    // 開始隨機顏色變化
+    setInterval(() => {
+      document.body.style.backgroundColor = getRandomColor();
     }, 1000);
   }
-
-  // 頁面載入後開始變色
-  window.onload = startColorChange;
+}, 1000);
 </script>
-
 </body>
 </html>
