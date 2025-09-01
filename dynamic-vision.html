@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>全螢幕極速動態視力訓練（極速閃現版）</title>
+<style>
+  html, body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    overflow: hidden;
+    font-family: Arial, sans-serif;
+    background-color: #f0f0f0;
+  }
+  #gameArea {
+    position: relative;
+    width: 100vw;   
+    height: 100vh;  
+    background-color: white;
+    overflow: hidden;
+  }
+  #letter {
+    position: absolute;
+    font-weight: bold;
+    user-select: none;
+  }
+  #ui {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    z-index: 10;
+    background-color: rgba(255,255,255,0.8);
+    padding: 10px;
+    border-radius: 8px;
+  }
+  #inputLetter {
+    font-size: 24px;
+    padding: 5px;
+  }
+</style>
+</head>
+<body>
+<div id="gameArea">
+  <div id="letter">A</div>
+</div>
+
+<div id="ui">
+  <input type="text" id="inputLetter" maxlength="1" placeholder="輸入字母並按 Enter">
+  <p>正確率：<span id="score">0 / 0</span></p>
+  <p>速度：<input type="range" id="speedRange" min="5" max="150" value="50"></p>
+</div>
+
+<script>
+const gameArea = document.getElementById('gameArea');
+const letterDiv = document.getElementById('letter');
+const inputLetter = document.getElementById('inputLetter');
+const scoreDisplay = document.getElementById('score');
+const speedRange = document.getElementById('speedRange');
+
+let currentLetter = 'A';
+let correct = 0;
+let total = 0;
+let speed = parseInt(speedRange.value);
+let posX = 0;
+let posY = 0;
+let angle = Math.random() * 2 * Math.PI;
+const autoSpeedIncrement = 3;
+const maxSpeed = 150;
+
+// 字母閃現設定
+let visible = true;
+
+// 隨機閃現
+function flashLetter() {
+    if(Math.random() < 0.2){ // 20% 機率閃現
+        visible = false;
+        letterDiv.style.visibility = 'hidden';
+        setTimeout(() => { visible = true; letterDiv.style.visibility = 'visible'; }, 50 + Math.random() * 100);
+    }
+}
+
+// 產生隨機字母
+function randomLetter() {
+    const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    return letters[Math.floor(Math.random() * letters.length)];
+}
+
+// 重置字母位置與角度
+function resetLetter() {
+    currentLetter = randomLetter();
+    letterDiv.textContent = currentLetter;
+    posX = Math.random() * (gameArea.clientWidth - 80);
+    posY = Math.random() * (gameArea.clientHeight - 80);
+    angle = Math.random() * 2 * Math.PI;
+}
+
+// 移動字母（隨機角度 + 閃現 + 縮放）
+function moveLetter() {
+    // 微幅隨機改變角度
+    angle += (Math.random() - 0.5) * 0.3;
+
+    posX += Math.cos(angle) * speed;
+    posY += Math.sin(angle) * speed;
+
+    // 邊界反彈
+    if(posX < 0 || posX > gameArea.clientWidth - 80) angle = Math.PI - angle;
+    if(posY < 0 || posY > gameArea.clientHeight - 80) angle = -angle;
+
+    letterDiv.style.left = posX + 'px';
+    letterDiv.style.top = posY + 'px';
+
+    // 隨機縮放
+    const size = 40 + Math.random() * 40; // 40px~80px
+    letterDiv.style.fontSize = size + 'px';
+
+    // 閃現
+    flashLetter();
+}
+
+resetLetter();
+setInterval(moveLetter, 10);
+
+// 輸入事件
+inputLetter.addEventListener('keydown', function(e) {
+    if(e.key === 'Enter'){
+        total++;
+        if(inputLetter.value.toUpperCase() === currentLetter){
+            correct++;
+            speed += autoSpeedIncrement;
+            if(speed > maxSpeed) speed = maxSpeed;
+        }
+        scoreDisplay.textContent = `${correct} / ${total}`;
+        inputLetter.value = '';
+        resetLetter();
+    }
+});
+
+// 調整速度（滑桿）
+speedRange.addEventListener('input', function() {
+    speed = parseInt(speedRange.value);
+});
+</script>
+</body>
+</html>
