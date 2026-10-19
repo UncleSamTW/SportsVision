@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>隨機顏色切換</title>
+  <style>
+    :root { font-family: system-ui, -apple-system, "Noto Sans TC", sans-serif; }
+    * { box-sizing: border-box; }
+    body { margin: 0; min-height: 100vh; background: #f3f4f6; transition: background-color .2s ease; display: grid; place-items: center; }
+    .panel { width: min(92vw, 400px); padding: 28px; background: rgba(255,255,255,.93); border-radius: 18px; box-shadow: 0 8px 28px rgba(0,0,0,.15); text-align: center; }
+    h1 { margin: 0 0 18px; font-size: 1.5rem; }
+    .controls { display: flex; justify-content: center; align-items: center; gap: 10px; flex-wrap: wrap; }
+    input { width: 95px; padding: 10px; font: inherit; font-size: 1.1rem; border: 1px solid #777; border-radius: 8px; }
+    button { padding: 10px 20px; border: 0; border-radius: 8px; font: inherit; font-weight: 600; cursor: pointer; }
+    #start { background: #1d4ed8; color: white; }
+    #stop { background: #e5e7eb; }
+    button:disabled { opacity: .45; cursor: not-allowed; }
+    #status { margin: 18px 0 0; min-height: 1.5em; }
+    .hint { color: #555; font-size: .85rem; margin-bottom: 0; }
+  </style>
+</head>
+<body>
+  <main class="panel">
+    <h1>隨機背景顏色</h1>
+    <div class="controls">
+      <label for="seconds">切換間隔（秒）</label>
+      <input id="seconds" type="number" min="0.1" step="0.1" value="3" />
+    </div>
+    <div class="controls" style="margin-top: 18px">
+      <button id="start">開始</button>
+      <button id="stop" disabled>停止</button>
+    </div>
+    <p id="status" aria-live="polite">尚未開始</p>
+    <p class="hint">紅、黃、綠、藍隨機切換，連續兩次不會相同。</p>
+  </main>
+  <script>
+    const colors = [
+      { name: '紅', hex: '#ff3333' },
+      { name: '黃', hex: '#ffdd22' },
+      { name: '綠', hex: '#26c653' },
+      { name: '藍', hex: '#2985ff' }
+    ];
+    const secondsInput = document.getElementById('seconds');
+    const startButton = document.getElementById('start');
+    const stopButton = document.getElementById('stop');
+    const status = document.getElementById('status');
+    let timer = null;
+    let previousIndex = -1;
+
+    function changeColor() {
+      const choices = colors.map((_, i) => i).filter(i => i !== previousIndex);
+      const nextIndex = choices[Math.floor(Math.random() * choices.length)];
+      previousIndex = nextIndex;
+      document.body.style.backgroundColor = colors[nextIndex].hex;
+      status.textContent = `目前顏色：${colors[nextIndex].name}`;
+    }
+    function stop() {
+      clearInterval(timer);
+      timer = null;
+      startButton.disabled = false;
+      stopButton.disabled = true;
+      secondsInput.disabled = false;
+      status.textContent += '（已停止）';
+    }
+    startButton.addEventListener('click', () => {
+      const seconds = Number(secondsInput.value);
+      if (!Number.isFinite(seconds) || seconds < 0.1) {
+        alert('請輸入至少 0.1 秒的有效數字。');
+        secondsInput.focus();
+        return;
+      }
+      clearInterval(timer);
+      changeColor();
+      timer = setInterval(changeColor, seconds * 1000);
+      startButton.disabled = true;
+      stopButton.disabled = false;
+      secondsInput.disabled = true;
+    });
+    stopButton.addEventListener('click', stop);
+  </script>
+</body>
+</html>
